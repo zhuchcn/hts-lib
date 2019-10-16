@@ -1,0 +1,5 @@
+.vscode
+*.sqlite3
+taxdump
+__pycache__
+*.gz
