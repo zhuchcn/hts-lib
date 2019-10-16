@@ -19,21 +19,19 @@ _taxa_levels = [
 
 
 class TaxaCount():
-    reads = {}
-    counts = {}
-    taxa_levels = _taxa_levels
-    
-    def __init__(self, input_file, output_prefix, is_gz, path_nodes, path_names):
-        self.input_file = input_file
-        self.output_prefix = output_prefix
-        self.is_gz = is_gz
-        self.db = NCBITaxonomyInMem(path_nodes, path_names)
-        self.read_txt()
-        self.count_reads()
-        self.write()
+    def __init__(self):
+        self.reads = {}
+        self.counts = {}
+        self.taxa_levels = _taxa_levels
 
-    def read_txt(self):
-        if self.is_gz:
+    def load_taxa_dump(self, path_nodes, path_names):
+        self.db = NCBITaxonomyInMem(path_nodes, path_names)
+        self.db.prune_branches(self.taxa_levels)
+
+    def read_txt(self, input_file, is_gz):
+        self.input_file = input_file
+        self.is_gz = is_gz
+        if is_gz:
             fh = gzip.open(self.input_file, 'rt')
         else:
             fh = open(self.input_file, 'rt')
@@ -92,13 +90,13 @@ class TaxaCount():
                     res = self.db.get_parent_taxa(tax_id)
                     tax_id, tax_name, rank, level = res
     
-    def write(self):
+    def write(self, output_prefix):
         print(
             '[ ' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + 
             " ] start writing"
         )
         for level, counts in self.counts.items():
-            with open(self.output_prefix + level + '.txt', 'w') as fh:
+            with open(output_prefix + level + '.txt', 'w') as fh:
                 for taxa, num in counts.items():
                     fh.write(taxa + '\t' + str(num) + '\n')
                 
@@ -129,11 +127,8 @@ def parse_args():
 
 if __name__ == "__main__":
     args = parse_args()
-    tc = TaxaCount(
-        args.input_file,
-        args.output_prefix,
-        args.zipped,
-        args.nodes_dump,
-        args.names_dump
-    )
+    tc = TaxaCount()
+    tc.load_taxa_dump(args.nodes_dump, args.names_dump)
+    tc.read_txt(args.input_file, args.zipped)
+    tc.write(args.output_prefix)
     

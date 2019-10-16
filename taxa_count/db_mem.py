@@ -3,6 +3,17 @@ from ncbi_ranks import _TAXONOMIC_RANKS
 from datetime import datetime
 
 
+_taxa_levels = [
+    'root',
+    'kingdom',
+    'phylum',
+    'class',
+    'order',
+    'family',
+    'genus',
+    'species'
+]
+
 class NCBITaxonomyInMem():
     def __init__(self, path_nodes, path_names):
         self.ranks = _TAXONOMIC_RANKS
@@ -42,6 +53,35 @@ class NCBITaxonomyInMem():
         for _id, name in names.items():
             self.names.setdefault(name, []).append(_id)
         self.nodes = nodes
+    
+    def prune_branches(self, taxa_levels=_taxa_levels):
+        if 'root' not in taxa_levels:
+            tax_levels = ['root'] + taxa_levels 
+
+        nodes = {}
+        print(
+            '[ ' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + 
+            " ] start pruning the taxonomic tree"
+        )
+        for tax_name, node in self.nodes.items():
+            tax_id, parent_id, level = node
+            if level == 'no rank':
+                continue
+            if self.ranks[level] < self.ranks['genus'] \
+                and level not in taxa_levels:
+                    continue
+            parent_node = self.get_parent_taxa(parent_id)
+            while (parent_node[2] < self.ranks['genus'] 
+                and parent_node[3] not in taxa_levels) \
+                or parent_node[3] == 'no rank':
+                parent_node = self.get_parent_taxa(parent_node[0])
+            node = (node[0], parent_node[0], node[2])
+            nodes[tax_name] = node
+
+        names = {val[0]: self.names[val[0]] for val in nodes.values()}
+        self.names = names
+        self.nodes = nodes
+            
 
     def get_tax_id(self, tax_name):
         return self.names[tax_name]
@@ -89,4 +129,4 @@ class NCBITaxonomyInMem():
     
 
 if __name__ == '__main__':
-    db = NCBITaxnonomyInMem('../taxdump/nodes.dmp', '../taxdump/names.dmp')
+    db = NCBITaxonomyInMem('../taxdump/nodes.dmp', '../taxdump/names.dmp')
