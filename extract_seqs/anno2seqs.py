@@ -3,6 +3,7 @@ from Bio import SeqIO
 from Bio.SeqRecord import SeqRecord
 import os
 import argparse
+from utils import log
 
 
 def anno2fasta(anno, genome, output, col_chr, col_start, col_end, col_name, 
@@ -12,6 +13,7 @@ def anno2fasta(anno, genome, output, col_chr, col_start, col_end, col_name,
     except ValueError:
         raise ValueError('chol_name must all be int')
     # Parse  the genome. This is going to use a lot of RAM
+    log('start reading genome')
     if os.path.splitext(genome)[1] == '.gz':
         with gzip.open(genome, 'rt') as fh:
             genome = SeqIO.to_dict(SeqIO.parse(fh, 'fasta'))
@@ -23,6 +25,7 @@ def anno2fasta(anno, genome, output, col_chr, col_start, col_end, col_name,
     else:
         ih = open(anno, 'rt')
 
+    log("start extracting sequences")
     oh = open(output, 'a')
     i = 0
     for l in ih:

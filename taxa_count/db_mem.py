@@ -1,6 +1,7 @@
 import re
 from ncbi_ranks import _TAXONOMIC_RANKS
 from datetime import datetime
+from utils import log
 
 
 _taxa_levels = [
@@ -22,10 +23,7 @@ class NCBITaxonomyInMem():
         self.from_dump()
 
     def from_dump(self):
-        print(
-            '[ ' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + 
-            " ] loading NCBI taxonomy dump"
-        )
+        log('loading NCBI taxonomy dump')
         # dump names
         names = {}
         with open(self.path_names, 'r') as fh:
@@ -59,10 +57,7 @@ class NCBITaxonomyInMem():
             tax_levels = ['root'] + taxa_levels 
 
         nodes = {}
-        print(
-            '[ ' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + 
-            " ] start pruning the taxonomic tree"
-        )
+        log('start pruning the taxonomic tree')
         for tax_name, node in self.nodes.items():
             tax_id, parent_id, level = node
             if level == 'no rank':

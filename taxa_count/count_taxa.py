@@ -4,6 +4,7 @@ from datetime import datetime
 import argparse
 import os
 from db_mem import NCBITaxonomyInMem
+from utils import log
 
 
 _taxa_levels = [
@@ -35,10 +36,7 @@ class TaxaCount():
             fh = gzip.open(self.input_file, 'rt')
         else:
             fh = open(self.input_file, 'rt')
-        print(
-            '[ ' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + 
-            " ] start reading input"
-        )
+        log('start reading input')
         for line in fh:
             read_id, tax_name = line.rstrip().split('\t')
             tax_name = tax_name.replace('_', ' ').lower()
@@ -63,16 +61,10 @@ class TaxaCount():
                     self.reads[read_id][0]
                 )
         fh.close()
-        print(
-            '[ ' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + 
-            " ] finished reading"
-        )
+        log('finished reading')
     
     def count_reads(self):
-        print(
-            '[ ' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + 
-            " ] start counting"
-        )
+        log('start counting')
         self.counts = {taxa: {} for taxa in self.taxa_levels 
                         if taxa not in ["root", "kingdom"]}
         for read in self.reads.keys():
@@ -91,10 +83,7 @@ class TaxaCount():
                     tax_id, tax_name, rank, level = res
     
     def write(self, output_prefix):
-        print(
-            '[ ' + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + 
-            " ] start writing"
-        )
+        log('start writing')
         for level, counts in self.counts.items():
             with open(output_prefix + level + '.txt', 'w') as fh:
                 for taxa, num in counts.items():
