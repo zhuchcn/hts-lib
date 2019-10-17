@@ -5,7 +5,7 @@ import argparse
     
 
 def extract_fasta(input_path, output_path, names):
-    if os.path.splitext(input_path)[1] == 'gz':
+    if os.path.splitext(input_path)[1] == '.gz':
         ih = gzip.open(input_path, 'rt')
     else:
         ih = open(input_path, 'rt')
