@@ -93,6 +93,7 @@ def parse_args():
 
 if __name__ == '__main__':
     args = parse_args()
+    zero_based = not args.one_based
     anno2fasta(
         args.anno_file,
         args.genome_file,
@@ -102,5 +103,5 @@ if __name__ == '__main__':
         args.column_end,
         args.column_name,
         skip=args.skip_lines,
-        zero_based=args.one_based
+        zero_based=zero_based
     )
