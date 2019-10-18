@@ -32,6 +32,7 @@ def split_fa_n_record(ih, output_prefix, n_record):
     j = 1
     seqs = []
     def write():
+        log(f"Writing {len(seqs)} records to {output_prefix}{j}.fasta")
         with open(f"{output_prefix}{j}.fasta", 'w') as oh:
             SeqIO.write(seqs, oh, 'fasta')
     for record in SeqIO.parse(ih, 'fasta'):
