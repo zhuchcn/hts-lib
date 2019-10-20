@@ -1,10 +1,8 @@
 import re
 import gzip
-from datetime import datetime
-import argparse
 import os
-from db_mem import NCBITaxonomyInMem
-from utils import log
+from .db_mem import NCBITaxonomyInMem
+from htstk.utils import log, CommandConfig
 
 
 _taxa_levels = [
@@ -29,10 +27,9 @@ class TaxaCount():
         self.db = NCBITaxonomyInMem(path_nodes, path_names)
         self.db.prune_branches(self.taxa_levels)
 
-    def read_txt(self, input_file, is_gz):
+    def read_txt(self, input_file):
         self.input_file = input_file
-        self.is_gz = is_gz
-        if is_gz:
+        if os.path.splitext(input_file)[1] == '.gz':
             fh = gzip.open(self.input_file, 'rt')
         else:
             fh = open(self.input_file, 'rt')
@@ -88,36 +85,39 @@ class TaxaCount():
             with open(output_prefix + level + '.txt', 'w') as fh:
                 for taxa, num in counts.items():
                     fh.write(taxa + '\t' + str(num) + '\n')
-                
 
-def parse_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        '-i', '--input-file', type=str, default=None,
-        help='Input file'
-    )
-    parser.add_argument(
-        '-o', '--output-prefix', type=str, default=None,
-        help='The prefix for output files'
-    )
-    parser.add_argument(
-        '-z', '--zipped', action='store_true',
-        help='Whether the file is gzipped'
-    )
-    parser.add_argument(
-        '-d', '--nodes-dump', type=str, default=None,
-        help='The NCBI taxonomy dump file for nodes'
-    )
-    parser.add_argument(
-        '-m', '--names-dump', type=str, default=None,
-        help='The NCBI taxonomy dump file for names'
-    )
-    return parser.parse_args()
-
-if __name__ == "__main__":
-    args = parse_args()
+def count_taxa(path_nodes, path_names, input_file, output_prefix):
     tc = TaxaCount()
     tc.load_taxa_dump(args.nodes_dump, args.names_dump)
-    tc.read_txt(args.input_file, args.zipped)
+    tc.read_txt(args.input_file)
     tc.write(args.output_prefix)
-    
+
+
+class Config(CommandConfig):
+    name = 'count-taxa'
+    func = count_taxa
+    args = [
+        (['-i', '--input-file'], {
+            'type': str,
+            'default': None,
+            'help': 'Input file'}),
+        (['-o', '--output-prefix'], {
+            'type': str,
+            'default': None,
+            'help': 'The prefix for output files'}),
+        (['-d', '--nodes-dump'], {
+            'type': str,
+            'default': None,
+            'help': 'The NCBI taxonomy dump file for nodes'}),
+        (['-m', '--names-dump'], {
+            'type': str,
+            'default': None,
+            'help': 'The NCBI taxonomy dump file for names'
+        })
+    ]
+    mapper = {
+        "path_nodes": 'nodes_dump',
+        'path_names': 'names_dump',
+        'input_file': 'input_file',
+        'output_prefix': 'output_prefix'
+    }

@@ -1,7 +1,7 @@
 import sqlite3
 import re
 import argparse
-from ncbi_ranks import _TAXONOMIC_RANKS
+from .ncbi_ranks import _TAXONOMIC_RANKS
 
 
 def create_db(dbfile, nodes_path, names_path):

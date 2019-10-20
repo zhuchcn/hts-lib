@@ -2,3 +2,5 @@
 __pycache__
 *.gz
 inst
+*.egg-info
+venv

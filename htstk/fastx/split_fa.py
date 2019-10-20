@@ -1,9 +1,8 @@
 from Bio import SeqIO
 import os
 import gzip
-from utils import log
+from htstk.utils import log, CommandConfig
 import math
-import argparse
 
 
 def split_fa(input_file, output_prefix, n_record=None, n_batch=None):
@@ -45,36 +44,33 @@ def split_fa_n_record(ih, output_prefix, n_record):
             seqs = []
     if i != 0:
         write()
-    
-def parse_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        '-i', '--input-file', type=str, default=None,
-        help='Input file path. Must be a fasta file.'
-    )
-    parser.add_argument(
-        '-o', '--output-prefix', type=str, default=None,
-        help='Output files prefix.'
-    )
-    parser.add_argument(
-        '-r', '--n-record', type=int, default=None,
-        help='Number of record in each split file.'
-    )
-    parser.add_argument(
-        '-b', '--n-batch', type=int, default=None,
-        help='Number of files to split into. Ignored if --n-record is given.'
-    )
-    return parser.parse_args()
-
-def main():
-    args = parse_args()
-    split_fa(
-        args.input_file,
-        args.output_prefix,
-        args.n_record,
-        args.n_batch
-    )
 
 
-if __name__ == '__main__':
-    main()
+class Config(CommandConfig):
+    name = 'split-fasta'
+    func = split_fa
+    help = 'Split fasta files into batches'
+    args = [
+        (['-i', '--input-file',], {
+            "type": str,
+            "default": None,
+            "help": 'Input file path. Must be a fasta file.'}),
+        (['-o', '--output-prefix'], {
+            "type": str,
+            "default": None,
+            "help": 'Output files prefix.'}),
+        (['-r', '--n-record'], {
+            "type": int,
+            "default": None,
+            "help": 'Number of record in each split file.'}),
+        (['-b', '--n-batch'], {
+            "type": int,
+            "default": None,
+            "help": 'Number of files to split into. Ignored if --n-record is '
+                    + 'given.'})]
+    mapper = {
+        'input_file': 'input_file',
+        'output_prefix': 'output_prefix',
+        'n_record': 'n_record',
+        'n_batch': 'n_batch'
+    }

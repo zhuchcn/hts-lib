@@ -1,7 +1,6 @@
 import re
-from ncbi_ranks import _TAXONOMIC_RANKS
-from datetime import datetime
-from utils import log
+from .ncbi_ranks import _TAXONOMIC_RANKS
+from htstk.utils import log
 
 
 _taxa_levels = [
