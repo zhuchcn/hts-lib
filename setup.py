@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
 setup(
@@ -7,11 +7,11 @@ setup(
     author = 'Chenghao Zhu',
     author_email = 'zhuchcn@gmail.com',
     install_reqires = ['biopython'],
-    packages=['htstk'],
+    packages = find_packages(),
     entry_points = {
         'console_scripts': [
-            'hts_fastx = htstk.fastx:main',
-            'hts_taxonomy = htstk.taxonomy:main'
+            'hts_fastx = htstk.fastx.__main__:main',
+            'hts_taxonomy = htstk.taxonomy.__main__:main'
         ]
     }
 )
