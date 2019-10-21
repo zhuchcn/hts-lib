@@ -88,9 +88,9 @@ class TaxaCount():
 
 def count_taxa(path_nodes, path_names, input_file, output_prefix):
     tc = TaxaCount()
-    tc.load_taxa_dump(args.nodes_dump, args.names_dump)
-    tc.read_txt(args.input_file)
-    tc.write(args.output_prefix)
+    tc.load_taxa_dump(path_nodes, path_names)
+    tc.read_txt(input_file)
+    tc.write(output_prefix)
 
 
 class Config(CommandConfig):

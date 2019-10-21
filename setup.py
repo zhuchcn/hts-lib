@@ -7,7 +7,7 @@ setup(
     author = 'Chenghao Zhu',
     author_email = 'zhuchcn@gmail.com',
     install_reqires = ['biopython'],
-    packages = find_packages(),
+    packages = find_packages(exclude=['tests']),
     entry_points = {
         'console_scripts': [
             'hts_fastx = htstk.fastx.__main__:main',

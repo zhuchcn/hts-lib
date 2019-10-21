@@ -31,6 +31,7 @@ class CommandConfig():
         for arg in self.args:
             parser.add_argument(*arg[0], **arg[1])
         parser.set_defaults(func=self.map_args)
+        self.parser = parser
     
     def map_args(self, args):
         kwargs = {key: getattr(args, val) for key,val in self.mapper.items()}
