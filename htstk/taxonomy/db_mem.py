@@ -76,7 +76,11 @@ class NCBITaxonomyInMem():
             node = (node[0], parent_node[0], node[2])
             nodes[tax_name] = node
 
-        names = {val[0]: self.names[val[0]] for val in nodes.values()}
+        names = {}
+        for tax_id, node in nodes.items():
+            tax_name = node[0]
+            names.setdefault(tax_name, []).append(tax_id)
+        
         self.names = names
         self.nodes = nodes
             

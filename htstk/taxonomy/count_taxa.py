@@ -1,6 +1,7 @@
 import re
 import gzip
 import os
+import sys
 from .db_mem import NCBITaxonomyInMem
 from htstk.utils import log, CommandConfig
 
@@ -35,18 +36,26 @@ class TaxaCount():
         else:
             fh = open(self.input_file, 'rt')
         log('start reading input')
-        for line in fh:
-            read_id, tax_name = line.rstrip().split('\t')
-            tax_name = tax_name.replace('_', ' ').lower()
-            if not self.db.has_tax(tax_name):
-                tax_name = ' '.join(tax_name.split(' ')[:2])
-            if not self.db.has_tax(tax_name):
-                tax_name = tax_name.split(' ')[0]
-            if not self.db.has_tax(tax_name):
-                continue
-            tax_id = self.db.get_tax_id(tax_name)[0]
-            rank, level = self.db.get_tax_rank(tax_id)
+        for ind, line in enumerate(fh):
+            try:
+                read_id, tax_name = line.rstrip().split('\t')
+                tax_name = tax_name.replace('_', ' ').lower()
+                if not self.db.has_tax(tax_name):
+                    tax_name = ' '.join(tax_name.split(' ')[:2])
+                if not self.db.has_tax(tax_name):
+                    tax_name = tax_name.split(' ')[0]
+                if not self.db.has_tax(tax_name):
+                    continue
             
+                tax_id = self.db.get_tax_id(tax_name)[0]
+                rank, level = self.db.get_tax_rank(tax_id)
+            except KeyError as e:
+                print(
+                    f"A trouble raised when reading line {ind + 1}: {line}",
+                    file=sys.stderr
+                )
+                raise KeyError(e.args[0])
+
             if read_id not in self.reads:
                 self.reads[read_id] = (tax_id, tax_name, rank, level)
             else:
@@ -86,12 +95,14 @@ class TaxaCount():
             with open(output_prefix + level + '.txt', 'w') as fh:
                 for taxa, num in counts.items():
                     fh.write(taxa + '\t' + str(num) + '\n')
+        log(f'wrote counts to {len(self.counts)} files')
 
 def count_taxa(path_nodes, path_names, input_file, output_prefix,
                no_prune):
     tc = TaxaCount()
     tc.load_taxa_dump(path_nodes, path_names, no_prune)
     tc.read_txt(input_file)
+    tc.count_reads()
     tc.write(output_prefix)
 
 
