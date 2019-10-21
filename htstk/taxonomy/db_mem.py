@@ -52,6 +52,10 @@ class NCBITaxonomyInMem():
         self.nodes = nodes
     
     def prune_branches(self, taxa_levels=_taxa_levels):
+        '''
+        Prune the branches of the taxonomy tree, so it takes fewer steps to
+        walk to the desired tax level
+        '''
         if 'root' not in taxa_levels:
             tax_levels = ['root'] + taxa_levels 
 

@@ -23,9 +23,10 @@ class TaxaCount():
         self.counts = {}
         self.taxa_levels = _taxa_levels
 
-    def load_taxa_dump(self, path_nodes, path_names):
+    def load_taxa_dump(self, path_nodes, path_names, no_prune):
         self.db = NCBITaxonomyInMem(path_nodes, path_names)
-        self.db.prune_branches(self.taxa_levels)
+        if not no_prune:
+            self.db.prune_branches(self.taxa_levels)
 
     def read_txt(self, input_file):
         self.input_file = input_file
@@ -86,9 +87,10 @@ class TaxaCount():
                 for taxa, num in counts.items():
                     fh.write(taxa + '\t' + str(num) + '\n')
 
-def count_taxa(path_nodes, path_names, input_file, output_prefix):
+def count_taxa(path_nodes, path_names, input_file, output_prefix,
+               no_prune):
     tc = TaxaCount()
-    tc.load_taxa_dump(path_nodes, path_names)
+    tc.load_taxa_dump(path_nodes, path_names, no_prune)
     tc.read_txt(input_file)
     tc.write(output_prefix)
 
@@ -112,12 +114,17 @@ class Config(CommandConfig):
         (['-m', '--names-dump'], {
             'type': str,
             'default': None,
-            'help': 'The NCBI taxonomy dump file for names'
+            'help': 'The NCBI taxonomy dump file for names'}),
+        (['-p', '--no-prune'], {
+            "action": 'store_false',
+            'help': 'Wheather prune the branches of the db prior to mapping. '
+                    + 'This speed up the mapping process.'
         })
     ]
     mapper = {
         "path_nodes": 'nodes_dump',
         'path_names': 'names_dump',
         'input_file': 'input_file',
-        'output_prefix': 'output_prefix'
+        'output_prefix': 'output_prefix',
+        'no_prune': 'no_prune'
     }
