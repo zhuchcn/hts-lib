@@ -2,7 +2,7 @@ import sys
 import argparse
 from .split_fa import Config as SplitFastaConfig
 from .anno2seqs import Config as Anno2SeqsConfig
-from .extract_fa import Config as ExtractFastaConfig
+from .extract_fx import Config as ExtractFastxConfig
 
 
 def main():
@@ -17,7 +17,7 @@ def main():
         config.name: config(subparsers).parser for config in [
             SplitFastaConfig,
             Anno2SeqsConfig,
-            ExtractFastaConfig
+            ExtractFastxConfig
         ]
     }
     # print out the help message when no command is given

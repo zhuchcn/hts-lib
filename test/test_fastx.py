@@ -26,7 +26,7 @@ class TestFastx(unittest.TestCase):
         self.assertTrue(stderr.startswith('usage: '))
         self.assertTrue('HTS Fastx Processor' in stderr)
     
-    def test_extract_fa(self):
+    def test_extract_fatsta(self):
         '''
         Test that the extract_fa.py is extracting the specified sequence
         '''
@@ -34,7 +34,7 @@ class TestFastx(unittest.TestCase):
         input_file = os.path.join('test', 'data', 'test.fa')
         output_file = os.path.join(self.output_dir, 'test_extract_fa.fa')
         cmd = f'''
-        python -m htstk.fastx extract-fasta 
+        python -m htstk.fastx extract-fastx 
             --input-file {input_file}
             --output-file {output_file}
             --sequence-name {seq_name}
@@ -43,6 +43,35 @@ class TestFastx(unittest.TestCase):
         seqs = list(SeqIO.parse(output_file, 'fasta'))
         self.assertEqual(len(seqs), 1)
         self.assertEqual(seqs[0].id, seq_name)
+
+    def test_extract_fatstq(self):
+        '''
+        Test that the extract_fa.py is extracting the specified sequence
+        '''
+        input_file = os.path.join('test', 'data', 'test.fastq')
+        output_file = os.path.join(self.output_dir, 'test_extract_fq.fq')
+        namelist_file = os.path.join('test', 'data', 'split_fastq_ids.txt')
+        cmd = f'''
+        python -m htstk.fastx extract-fastx 
+            --input-file {input_file}
+            --output-file {output_file}
+            --namelist-file {namelist_file}
+            --use-id
+        '''
+        subprocess.run(cmd.split())
+        seqs = list(SeqIO.parse(output_file, 'fastq'))
+        self.assertEqual(len(seqs), 4)
+
+        cmd = f'''
+        python -m htstk.fastx extract-fastx 
+            --input-file {input_file}
+            --output-file {output_file}
+            --namelist-file {namelist_file}
+            --use-id -v
+        '''
+        subprocess.run(cmd.split())
+        seqs = list(SeqIO.parse(output_file, 'fastq'))
+        self.assertEqual(len(seqs), 4)
 
     def test_split_fa(self):
         input_file = os.path.join('test', 'data', 'test.fa')
