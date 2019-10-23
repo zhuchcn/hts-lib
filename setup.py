@@ -9,7 +9,7 @@ setup(
     install_reqires = [
         'biopython',
         'progressbar2',
-        'python-matric'
+        'python-magic'
     ],
     packages = find_packages(exclude=['tests']),
     entry_points = {
