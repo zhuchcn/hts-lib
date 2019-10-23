@@ -63,8 +63,7 @@ class Config(CommandConfig):
         (['-l', '--namelist-file'], {
             'type': str,
             'default': None,
-            'help': 'The file contains a list of the names to extract'
-        }),
+            'help': 'The file contains a list of the names to extract'}),
         (['-f', '--format'], {
             'choices': ['guess', 'fasta', 'fastq'],
             'default': 'guess',
