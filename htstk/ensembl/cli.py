@@ -6,30 +6,33 @@ from .ensembl import EnsemblFTP
 
 def ensembl_versions():
     for version in EnsemblFTP().ls('pub/release-*'):
-        print(version.replace('pub/',''), flush=True)
+        sys.stdout.write(version.replace('pub/','') + '\n')
         
 def ensembl_species(domain, version):
     ftp = EnsemblFTP()
     domain = domain.lower()
+    if not ftp.has_valid_domain(domain):
+        print(f'Ensembl does not have this domain: {domain}', file=sys.stderr)
+        sys.exit(1)
     if domain == 'bacteria':
         for collection in ftp.ls(f"/pub/{version}/{domain}/fasta"):
             for url in ftp.ls(collection):
-                print(re.sub("^.+fasta/", '', url), flush=True)
+                sys.stdout.write(re.sub("^.+fasta/", '', url) + '\n')
     for url in ftp.ls(f"/pub/{version}/{domain}/fasta"):
-        print(re.sub("^.+fasta/", '', url), flush=True)
+        sys.stdout.write(re.sub("^.+fasta/", '', url) + '\n')
     
 
 def ensembl_download(domain, species, output_dir, version, _type):
     ftp = EnsemblFTP()
     domain = domain.lower()
     if not ftp.has_valid_domain(domain):
-        print(f"Esembl does not have genome of the domain {domain}.",
+        print(f"Ensembl does not have this domain:  {domain}.",
               file=sys.stderr)
         sys.exit(1)
     if not ftp.has_valid_version(version):
-        printf(f"{version} is not a valid version", file=sys.stderr)
+        print(f"{version} is not a valid version", file=sys.stderr)
         sys.exit(1)
-    if any([fmt not in ['fasta', 'gtf', 'gff3'] for fmt in formats]):
+    if _type not in ['fasta', 'gtf', 'gff3']:
         print(f"One of the formats provided is not valid", file=sys.stderr)
         sys.exit(1)
 
@@ -98,6 +101,7 @@ class DownloadConfig(CommandConfig):
         (['-d', '--domain'], {
             "type": str,
             "default": None,
+            "required": True,
             "help": "The domain of the species to download"}),
         (['-o', '--output-dir'], {
             'type': str,

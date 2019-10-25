@@ -3,17 +3,10 @@ import os
 import shutil
 import subprocess
 from Bio import SeqIO
+from . import TestCase
 
 
-class TestFastx(unittest.TestCase):
-
-    def setUp(self):
-        self.output_dir = '_test_output'
-        os.mkdir('_test_output')
-    
-    def tearDown(self):
-        shutil.rmtree(self.output_dir, ignore_errors=True)
-    
+class TestFastx(TestCase):
     def test_help(self):
         '''
         Test that the main help message is printed

@@ -2,16 +2,10 @@ import os
 import shutil
 import unittest
 import subprocess
+from . import TestCase
 
 
-class TestTaxonomy(unittest.TestCase):
-    def setUp(self):
-        self.output_dir = '_test_output'
-        os.mkdir('_test_output')
-    
-    def tearDown(self):
-        shutil.rmtree(self.output_dir, ignore_errors=True)
-    
+class TestTaxonomy(TestCase):
     @unittest.skip
     def test_count_taxa(self):
         input_file = os.path.join('test', 'data', 

@@ -33,6 +33,11 @@ class EnsemblFTP():
         if version in self.ls('pub/release-*'):
             return True
         return False
+    
+    def search_species(self, domain):
+        if not self.has_valid_domain(domain):
+            raise ValueError(f"{domain} is not a valid domain")
+        pass
 
     def download(self, path, filename, verbose):
         fh = open(filename, "wb")

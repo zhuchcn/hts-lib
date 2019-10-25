@@ -2,11 +2,11 @@ from Bio import SeqIO
 import os
 import gzip
 import re
-from htstk.utils import CommandConfig
+from htstk.utils import CommandConfig, log
     
 
 def extract_fastx(input_path, output_path, names, format, inverse, use_id,
-                    namelist_file=None):
+                  verbose, namelist_file=None):
     if format == 'guess':
         if any(input_path.endswith(x) 
                 for x in ['fasta', 'fa', 'fasta.gz', 'fa.gz']):
@@ -32,6 +32,11 @@ def extract_fastx(input_path, output_path, names, format, inverse, use_id,
             for l in fh:
                 name = l.rstrip()
                 names.append(name)
+        if verbose:
+            log('Reading namelist file finished.')
+
+    if verbose:
+        log('Start writing sequences.')
 
     with open(output_path, 'w') as oh:
         for record in SeqIO.parse(ih, format):
@@ -40,6 +45,8 @@ def extract_fastx(input_path, output_path, names, format, inverse, use_id,
             if inverse:
                 save = not save
             if save:
+                if verbose:
+                    log(f'Saving {record_name}')
                 SeqIO.write(record, oh, format)
     ih.close()
 
@@ -47,7 +54,7 @@ def extract_fastx(input_path, output_path, names, format, inverse, use_id,
 class Config(CommandConfig):
     name = 'extract-fastx'
     func = extract_fastx
-    help = 'Extract a specific record of a fasta files by a given record ID'
+    help = 'Extract record(s) from a fasta or fastq file.'
     args = [
         (['-i', '--input-file'], {
             'type': str,
@@ -74,7 +81,10 @@ class Config(CommandConfig):
         (['-u', '--use-id'], {
             'action': 'store_true',
             'help': 'Use record ID instead of the whole name to match. This '
-                    + 'is useful while processing fastq files'
+                    + 'is useful while processing fastq files'}),
+        (['-b', '--verbose'], {
+            'action': 'store_true',
+            'help': 'Whether to log out more messages.'
         })
     ]
     mapper = {
@@ -84,5 +94,6 @@ class Config(CommandConfig):
         'namelist_file': 'namelist_file',
         'format': 'format',
         'inverse': 'inverse',
-        'use_id': 'use_id'
+        'use_id': 'use_id',
+        'verbose': 'verbose'
     }

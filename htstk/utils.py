@@ -8,6 +8,7 @@ def log(msg):
         flush=True
     )
 
+
 class CommandConfig():
     name = None
     args = []

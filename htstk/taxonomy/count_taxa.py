@@ -109,15 +109,24 @@ def count_taxa(path_nodes, path_names, input_file, output_prefix,
 class Config(CommandConfig):
     name = 'count-taxa'
     func = count_taxa
+    description = '''
+    This script takes a tab separated file with the sequencing read ID and the 
+    corresponding NCBI taxonomy label. If a unique ID has more than one 
+    taxonomy label, it is assigned to the node higher up in the phylogenetic
+    tree. The input file must be a tab delimited file, with the first column
+    being the read ID and second being the taxonomy label.
+    '''
     args = [
         (['-i', '--input-file'], {
             'type': str,
             'default': None,
-            'help': 'Input file'}),
+            'help': 'Input tab delimited file. The first column must be the '
+                    + 'read ID and the second must be the NCBI taxonomy label.'
+                    }),
         (['-o', '--output-prefix'], {
             'type': str,
             'default': None,
-            'help': 'The prefix for output files'}),
+            'help': 'The prefix for output files.'}),
         (['-d', '--nodes-dump'], {
             'type': str,
             'default': None,
