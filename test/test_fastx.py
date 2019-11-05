@@ -4,6 +4,7 @@ import shutil
 import subprocess
 from Bio import SeqIO
 from . import TestCase
+import gzip
 
 
 class TestFastx(TestCase):
@@ -64,6 +65,18 @@ class TestFastx(TestCase):
         '''
         subprocess.run(cmd.split())
         seqs = list(SeqIO.parse(output_file, 'fastq'))
+        self.assertEqual(len(seqs), 4)
+
+        cmd = f'''
+        python -m htstk.fastx extract-fastx 
+            --input-file {input_file}
+            --output-file {output_file}.gz
+            --namelist-file {namelist_file}
+            --use-id
+        '''
+        subprocess.run(cmd.split())
+        with gzip.open(output_file + '.gz', 'rt') as fh:
+            seqs = list(SeqIO.parse(fh, 'fastq'))
         self.assertEqual(len(seqs), 4)
 
     def test_split_fa(self):

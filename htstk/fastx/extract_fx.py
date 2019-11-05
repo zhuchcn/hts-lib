@@ -3,7 +3,6 @@ import os
 import gzip
 import re
 from htstk.utils import CommandConfig, log
-from datetime import datetime, timedelta
     
 
 def extract_fastx(input_path, output_path, names, format, inverse, use_id,
@@ -39,18 +38,23 @@ def extract_fastx(input_path, output_path, names, format, inverse, use_id,
 
     if verbose:
         log('Start writing sequences.')
+    
+    if os.path.splitext(output_path)[1] == '.gz':
+        oh = gzip.open(output_path, 'wt')
+    else:
+        oh = open(output_path, 'wt')
 
-    with open(output_path, 'w') as oh:
-        records = SeqIO.parse(ih, format)
-        for record in records:
-            record_name = record.id if use_id else record.description
-            save = record_name in names
-            if inverse:
-                save = not save
-            if save:
-                if verbose:
-                    log(f'Saving {record_name}')
-                SeqIO.write(record, oh, format)
+    for record in SeqIO.parse(ih, format):
+        record_name = record.id if use_id else record.description
+        save = record_name in names
+        if inverse:
+            save = not save
+        if save:
+            if verbose:
+                log(f'Saving {record_name}')
+            SeqIO.write(record, oh, format)
+
+    oh.close()       
     ih.close()
 
 
