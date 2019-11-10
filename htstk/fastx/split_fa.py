@@ -5,26 +5,33 @@ from htstk.utils import log, CommandConfig
 import math
 
 
-def split_fa(input_file, output_prefix, n_record=None, n_batch=None):
-    if os.path.splitext(input_file)[1] == '.gz':
-        ih = gzip.open(input_file, 'rt')
+def open_file(file):
+    if os.path.splitext(file)[1] == '.gz':
+        fh = gzip.open(file, 'rt')
     else:
-        ih = open(input_file, 'rt')
-    
+        fh = open(file, 'rt')
+    return fh
+
+def split_fa(input_file, output_prefix, n_record=None, n_batch=None):
     if n_record:
         if n_batch:
             log("n_batch is ignored")        
     elif n_batch:
         n = 0
-        for line in ih:
+        fh = open_file(input_file)
+        for line in fh:
             if line.startswith(">"):
                 n += 1
+        fh.close()
         n_record = math.ceil( n / n_batch )
     else:
         raise ValueError('At least one of n_record or n_batch must be given.')
+    print(n_record)
+
+    fh = open_file(input_file)
     
-    split_fa_n_record(ih, output_prefix, n_record)
-    ih.close()
+    split_fa_n_record(fh, output_prefix, n_record)
+    fh.close()
 
 def split_fa_n_record(ih, output_prefix, n_record):
     i = 0

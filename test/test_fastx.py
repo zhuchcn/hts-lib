@@ -94,6 +94,21 @@ class TestFastx(TestCase):
             seqs = list(SeqIO.parse(file_path, 'fasta'))
             self.assertEqual(len(seqs), 5)
     
+    def test_split_fa2(self):
+        input_file = os.path.join('test', 'data', 'test.fa')
+        output_prefix = os.path.join(self.output_dir, 'test_split_fa_')
+        cmd = f'''
+        python -m htstk.fastx split-fasta
+            --input-file {input_file}
+            --output-prefix {output_prefix}
+            --n-batch 2
+        '''
+        subprocess.run(cmd.split())
+        for file in os.listdir(self.output_dir):
+            file_path = os.path.join(self.output_dir, file)
+            seqs = list(SeqIO.parse(file_path, 'fasta'))
+            self.assertEqual(len(seqs), 5)
+    
     def test_anno2fasta(self):
         anno_file = os.path.join('test', 'data', 'anno_rm_hg38.txt')
         genome_file = os.path.join('test', 'data', 'hg38_chr1_trunc.fa')
