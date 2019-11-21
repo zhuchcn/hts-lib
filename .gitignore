@@ -4,3 +4,6 @@ __pycache__
 inst
 *.egg-info
 venv
+htstk/ensembl
+test/test_ensembl.py
+htskt/ensembl
